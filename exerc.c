@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 int strleng(char *s)
 {
     int i = 0;
@@ -6,6 +7,7 @@ int strleng(char *s)
         ;
     return i - 1;
 }
+
 void Inverter(char s[])
 {
     int tamanho = 0;
@@ -17,7 +19,7 @@ void Inverter(char s[])
     int fim = tamanho - 1;
     char period;
 
-    while (comeco > fim)
+    while (comeco < fim)   
     {
         period = s[comeco];
         s[comeco] = s[fim];
@@ -26,44 +28,55 @@ void Inverter(char s[])
         fim--;
     }
 }
-void deslocamento(char s[], int d[])
+
+void deslocamento(char *s, int n)
 {
-    int n;
-    scanf("%d", &n);
-    int tamanho = 0;
-    while (s[tamanho] != '\0')
+    int i;
+    for (i = 0; s[i] != '\0'; i++)
     {
-        tamanho++;
+        if (s[i] >= 'a' && s[i] <= 'z')
+            s[i] = 'a' + (((s[i] - 'a') + n) % 26 + 26) % 26;
+        else if (s[i] >= 'A' && s[i] <= 'Z')
+            s[i] = 'A' + (((s[i] - 'A') + n) % 26 + 26) % 26;
+        else if (s[i] >= '0' && s[i] <= '9')
+            s[i] = '0' + (((s[i] - '0') + n) % 10 + 10) % 10;
     }
-    if (n == 0)
+}
+
+void trocarParesImpares(char *s)
+{
+    int i, j, k, tamanho, temp;
+    tamanho = strleng(s);
+    char sCp[tamanho + 1];
+    for (i = 0; i < tamanho; i++)
+        sCp[i] = s[i];
+    sCp[i] = '\0';
+    j = 1;
+    k = 0;
+    for (i = 0; sCp[i] != '\0' && s[k] != '\0'; i++)
     {
-        return;
-    }
-    int comeco = 0;
-    int fim = tamanho - 1;
-    char period;
-    int i, j;
-    n = n % tamanho;
-    for (i = 0; i < n; i++)
-    {
-        period = s[tamanho - 1];
-        period = d[tamanho - 1];
-        for (j = 0; i < n; j--)
+        if (i % 2 == 1)
         {
-            s[j] = s[j - 1];
-            d[j] = d[j - 1];
+            s[k] = sCp[i];
+            k += 2;
+        }
+        else
+        {
+            s[j] = sCp[i];
+            j += 2;
         }
     }
-    period = s[0];
-    period = d[0];
+    if (tamanho % 2 == 1)
+        s[i] = '\0';
 }
+
 void inverterCaixa(char *s)
 {
     int i;
     for (i = 0; s[i] != '\0'; i++)
     {
         if ((s[i] >= 'a' && s[i] <= 'z') || (s[i] >= 'A' && s[i] <= 'Z'))
-        { // verifico se e letra
+        { 
             if (s[i] >= 'a' && s[i] <= 'z')
                 s[i] -= 32;
             else if (s[i] >= 'A' && s[i] <= 'Z')
@@ -71,41 +84,43 @@ void inverterCaixa(char *s)
         }
     }
 }
-void Rotacionar(char s[])
+
+void Rotacionar(char s[], int n)
 {
-    int n;
-    scanf("%d", &n);
     int tamanho = 0;
     while (s[tamanho] != '\0')
     {
         tamanho++;
     }
-    if (n == 0)
-    {
+    if (tamanho == 0)
         return;
-    }
-    int j, i;
-    char period;
+
     n = n % tamanho;
+    if (n < 0)
+        n += tamanho; 
+    if (n == 0)
+        return;
+
+    int i, j;
+    char period;
     for (i = 0; i < n; i++)
     {
         period = s[tamanho - 1];
-
-        for (j = 0; j < n; j--)
+        for (j = tamanho - 1; j > 0; j--)
         {
-
             s[j] = s[j - 1];
         }
+        s[0] = period;
     }
-    s[0] = period;
 }
+
 void trocarMetades(char *s)
 {
     int tamanho, i, j, k;
     tamanho = strleng(s);
     char sCp[tamanho + 1];
     for (i = 0; i < tamanho / 2; i++)
-        sCp[i] = s[i]; // copiar o inicio
+        sCp[i] = s[i]; 
     sCp[i] = '\0';
     if (tamanho % 2 == 0)
     {
@@ -138,36 +153,47 @@ void trocarMetades(char *s)
         }
     }
 }
+
 int main()
 {
     char str[10001];
-    int n;
+    int n, param;
     scanf("%[^\n]%*c", str);
-    while (n != 0)
+
+    do
     {
         scanf("%d", &n);
+        if (n == 0)
+            break;
+
         switch (n)
         {
         case 1:
             Inverter(str);
             break;
         case 2:
-
+            scanf("%d", &param);
+            deslocamento(str, param);
             break;
         case 3:
-            deslocamento(str, str);
+            trocarParesImpares(str);
             break;
         case 4:
             inverterCaixa(str);
             break;
         case 5:
-            Rotacionar(str);
+            scanf("%d", &param);
+            Rotacionar(str, param);
             break;
         case 6:
-
+            trocarMetades(str); 
+            break;
+        default:
+            n = 0; 
             break;
         }
-    }
+    } while (n != 0);
+
     printf("%s\n", str);
     return 0;
 }
